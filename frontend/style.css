@@ -1,0 +1,198 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Manufacturing+Consent&family=Story+Script&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Libertinus+Keyboard&family=Manufacturing+Consent&family=Story+Script&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Libertinus+Keyboard&family=Manufacturing+Consent&family=Pacifico&family=Story+Script&display=swap');
+
+@media screen and (max-width:600px){
+}
+body,html{
+    overflow-x: hidden;
+    overflow-y:hidden;
+}
+
+
+
+#desc{
+    position: relative;
+    padding-top:15px;
+}
+
+html{
+    background-color: antiquewhite;
+    height: 100%;
+    overflow: hidden;
+}
+
+
+.curved-edge {
+  --c: 70px;
+  height: 200px;
+  width:100%;
+  min-width: 90%;
+  max-width:120%;
+  aspect-ratio: 3/2;
+  mask: radial-gradient(60% var(--c) at bottom,#0000 calc(100% - 2px),#000);
+  background: #40C0CB;
+  border-bottom-width:5px;
+  border-bottom-style:solid;
+  border-bottom-color:aquamarine;
+}
+
+
+h1{
+    font-family: "Story Script", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+    font-size:50px;
+    position:relative;
+    bottom:200px;
+    margin-left:30px;
+}
+
+
+
+body{
+    margin:0;
+}
+
+#welcome{
+    text-align:center;
+    padding:0px;
+    font-family: "Libertinus Keyboard", system-ui;
+    font-weight: 400;
+    font-style: normal;
+    margin-left:auto;
+    margin-right:auto;
+    position:relative;
+    bottom:90px;
+    font-weight:1000;
+    font-size:60px;
+    width:600px;
+    min-width:600px;
+    height:60px;
+    color:black;
+
+}
+
+
+#desc{
+    text-align:center;
+    font-family: "Pacifico", cursive;
+    font-weight: 400;
+    font-style: normal;
+    font-size:20px;
+    margin-left:auto;
+    margin-right:auto;
+    position:relative;
+    bottom:130px;
+    min-width:600px;
+    width:auto;
+    height:100px;
+
+}
+
+#button{
+    font-family: "Roboto", sans-serif;
+    background-color: #4fa4ac;
+    color:white;
+    position:relative;
+    top:5px;
+    padding:5px;
+    font-size:25px;
+    width:290px;
+    padding-top:10px;
+    padding-bottom:10px;
+    margin-left:auto;
+    margin-right:auto;
+    text-align:center;
+    border-top-right-radius:8px;
+    border-bottom-left-radius:8px;
+    transition: all 0.3s ease;
+}
+
+#link{
+    text-decoration: none;
+    color:black;
+}
+
+#buttondiv{
+    text-align:center;
+}
+
+#button:hover{
+    font-size:26px;
+    background-color:#252424;
+    color: #ffffff;
+    border: 1px solid #111827;
+    box-shadow: 0 0 16px 4px rgba(0, 0, 0, 0.25);
+    transform: scale(1.05);
+}
+
+
+#dropdown{
+    position:relative;
+    text-align:center;
+    font-size:55px;
+    cursor: pointer;
+}
+
+#dropdownbutton{
+    position:absolute;
+    top:48px;
+    right:0;
+    background-color:#3a7c8b;
+    color:#ffffff;
+    padding:10px;
+    border-radius:8px;
+    z-index:1001;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+#dropdownbutton p{
+    background-color:#44d5e2;
+    border-radius:8px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    height:36px;
+    width:140px;
+    margin:0;
+    font-size:16px;
+    font-family: "Roboto", sans-serif;
+    transition: all 0.3s ease;
+}
+
+#linkteam{
+    color: white;
+    text-decoration: none;
+}
+
+#dropdownbutton p + p{
+    margin-top: 10px;
+}
+
+#dropdownbutton p:hover{
+    background-color:#252424;
+    color:#ffffff;
+    border: 1px solid #111827;
+    box-shadow: 0 0 16px 4px rgba(0, 0, 0, 0.25);
+    transform: scale(1.05);
+}
+
+#dropdowndiv{
+    position:fixed;
+    top:30px;
+    right:10px;
+    z-index:1000;
+}
+
+
+#dropdownbutton{
+    display:none;
+}
+
+#dropdowndiv:hover #dropdownbutton{
+    display:block;

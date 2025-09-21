@@ -1,0 +1,175 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Story+Script&display=swap');
+
+html, body {
+    height: 100%;
+    overflow: hidden;
+}
+
+html {
+    background-color: antiquewhite;
+}
+
+body {
+    margin: 0;
+    font-family: 'Poppins', sans-serif;
+}
+
+.curved-edge {
+  --c: 70px;
+  height: 200px;
+  width:100%;
+  min-width: 90%;
+  max-width:120%;
+  aspect-ratio: 3/2;
+  mask: radial-gradient(60% var(--c) at bottom,#0000 calc(100% - 2px),#000);
+  background: #40C0CB;
+  border-bottom-width:5px;
+  border-bottom-style:solid;
+  border-bottom-color:aquamarine;
+}
+
+h1{
+    font-family: "Story Script", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+    font-size:50px;
+    position:relative;
+    bottom:200px;
+    margin-left:30px;
+}
+
+#dropdowndiv{
+    position:fixed;
+    top:30px;
+    right:10px;
+    z-index:1000;
+}
+
+#dropdown{
+    position:relative;
+    text-align:center;
+    font-size:55px;
+    cursor: pointer;
+}
+
+#dropdownbutton{
+    position:absolute;
+    top:48px;
+    right:0;
+    background-color:#3a7c8b;
+    color:#ffffff;
+    padding:10px;
+    border-radius:8px;
+    z-index:1001;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    display:none;
+}
+
+#dropdowndiv:hover #dropdownbutton{
+    display:block;
+}
+
+#dropdownbutton p{
+    background-color:#44d5e2;
+    border-radius:8px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    height:36px;
+    width:140px;
+    margin:0;
+    font-size:16px;
+    font-family: "Roboto", sans-serif;
+    transition: all 0.3s ease;
+}
+
+#dropdownbutton p + p{
+    margin-top:10px;
+}
+
+#dropdownbutton p:hover{
+    background-color:#252424;
+    color:#ffffff;
+    border: 1px solid #111827;
+    box-shadow: 0 0 16px 4px rgba(0, 0, 0, 0.25);
+    transform: scale(1.05);
+}
+
+#linkteam{
+    color: #ffffff;
+    text-decoration: none;
+}
+
+#class p {
+    display: inline-block;
+    padding: 5px 15px;
+    background-color: #40C0CB;
+    border-radius: 8px;
+    margin: 0 5px;
+    font-weight: bold;
+    font-size: 20px;
+    transition: all 0.3s ease;
+}
+
+body #class {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 16px;
+    text-align: center;
+    z-index: 100;
+}
+
+#class p:hover {
+    position: relative;
+    bottom: 5px;
+    color: #2c3343;
+    background-color: #4fa4ac;
+    font-weight: bold;
+    border: 1px solid #111827;
+    box-shadow: 0 0 16px 4px rgba(0, 0, 0, 0.25);
+    transform: scale(1.1);
+}
+
+#class .on {
+    background-color: #128792;
+}
+
+#class .on:hover {
+    background-color: #4fa4ac;
+}
+
+
+main {
+    min-height: calc(100vh - 200px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 12px 220px;
+    margin-top: -120px;
+}
+
+#central-box {
+    width: 60vw;
+    max-width: 720px;
+    height: 56vh;
+    min-height: 360px;
+    background-color: #40C0CB;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 0 16px 4px rgba(0, 0, 0, 0.08);
+    margin-bottom: 240px;
+}
+
+@media (max-width: 480px) {
+    main {
+        padding: 0 12px 260px;
+    }
+    #central-box {
+        width: 90vw;
+        height: 50vh;
+    }
+}

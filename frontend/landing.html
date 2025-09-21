@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Landing • Quizzed</title>
+<link rel="stylesheet" href="style.css"/>
+<link rel="stylesheet" href="landing.css"/>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=menu" />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&icon_names=menu,power_settings_new" />
+
+<style>
+   #container {
+    display: flex;
+    gap: 20px;
+    padding: 0 20px 20px 20px; /* remove top padding only */
+    min-height: calc(100vh - 200px);
+    align-items: flex-start;   /* ensure items align to top */
+    }
+    #quiz-list-panel { width: 220px; border-right:1px solid #ccc; position:sticky; top:20px; max-height: calc(100vh - 60px); overflow-y:auto; padding-right:10px; }
+    #quiz-list-panel h3 { margin-bottom: 10px; }
+    #quiz-list-panel button { display: block; width: 100%; margin-bottom: 10px; padding: 12px 15px; cursor: pointer; border: none; background-color: #4fa4ac; border-radius: 6px; font-size: 16px; text-align: left; color: white; transition: background-color 0.2s; }
+    #quiz-list-panel button:hover { background-color: #3a838a; }
+    #quiz-list-panel button.selected { background-color: #007BFF; font-weight: bold; }
+    #central-box { flex:1; padding:20px; border:1px solid #ccc; border-radius:6px; min-height:300px; margin-left:20px; }
+    #start-quiz-btn, #submit-btn, #next-btn { padding: 12px 40px; font-size:16px; cursor:pointer; border-radius:6px; border:none; transition: background-color 0.2s; }
+    #start-quiz-btn { background-color:#28a745; color:white; display:none; margin-top:20px; }
+    #start-quiz-btn:hover { background-color:#218838; }
+    #submit-btn { background-color:#007BFF; color:white; }
+    #submit-btn:hover { background-color:#0056b3; }
+    #next-btn { background-color:#28a745; color:white; display:none; }
+    #next-btn:hover { background-color:#218838; }
+    #score-display { font-weight:bold; font-size:18px; margin-bottom:15px; display:none; }
+        .logout-button {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0;
+      display: flex;
+      align-items: center;
+    }
+</style>
+</head>
+<body>
+<div class="curved-edge"></div>
+<h1>Quizzed</h1>
+<div id="dropdowndiv" style="display:flex; align-items:center; gap:50px;">
+   <!-- Clickable logout button -->
+<button id="logout-btn" class="logout-button">
+  <span class="material-symbols-outlined">power_settings_new</span>
+</button>
+
+    <div id="dropdown" class="material-symbols-outlined">menu</div>
+    <div id="dropdownbutton">
+      <p><a href="team.html" target="_self" id="linkteam">Our Team</a></p>
+     <!-- <p>Our Journey</p> -->
+    <!--  <p><a href="landing.html" target="_self">Back to Quizzes</a></p> -->
+    </div>
+</div>
+
+<main id="container">
+
+    <!-- Quiz List -->
+     <div id="quiz-list-panel">
+         <div id="logged-in-user" style="font-weight:600; font-size:16px; margin-bottom:10px;"></div>
+
+        <button id="leaderboard-btn"
+            style="width:100%; margin-bottom:15px; padding:10px; background-color:#ff9800; color:white; border:none; border-radius:6px; cursor:pointer; font-size:16px;">
+            View Leaderboard
+        </button>
+
+        <h3>Available Quizzes</h3>
+        <div id="quiz-buttons"></div>
+    </div>
+
+    <!-- Central Box -->
+    <div id="central-box">
+        <h2>Select a quiz to start</h2>
+        <div style="text-align:center;">
+            <button id="start-quiz-btn">Start Quiz</button>
+        </div>
+
+        <!-- Quiz Questions -->
+        <div id="quiz-question-container" style="margin-top:20px; display:none;">
+            <p id="question-text" style="font-weight:bold; font-size:18px;"></p>
+            <div id="options-container" style="margin-top:10px;"></div>
+            <div style="margin-top:15px;">
+                <button id="submit-btn">Submit</button>
+                <button id="next-btn">Next</button>
+            </div>
+        </div>
+
+        <!-- Score Display -->
+        <div id="score-display"></div>
+    </div>
+
+</main>
+
+<script>
+let selectedQuiz = null, buttons = [], currentQuestions = [], currentIndex = 0, selectedOption = null, score = 0;
+
+// Replace default alert with centered custom alert (keeping same text/logic)
+function showCenteredAlert(message) {
+    const alertDiv = document.createElement("div");
+    alertDiv.textContent = message;
+    alertDiv.style.position = "fixed";
+    alertDiv.style.top = "45%";
+    alertDiv.style.left = "52%";
+    alertDiv.style.transform = "translate(-50%, -50%)";
+    alertDiv.style.backgroundColor = "white";
+    alertDiv.style.border = "2px solid #007BFF";
+    alertDiv.style.borderRadius = "10px";
+    alertDiv.style.padding = "30px 50px";
+    alertDiv.style.minWidth = "450px";    // ensures minimum width
+    alertDiv.style.fontSize = "16px";
+    alertDiv.style.fontWeight = "600";
+    alertDiv.style.textAlign = "center";
+    alertDiv.style.boxShadow = "0 4px 12px rgba(0,0,0,0.3)";
+    alertDiv.style.zIndex = 1000;
+
+    const okBtn = document.createElement("button");
+    okBtn.textContent = "OK";
+    okBtn.style.marginTop = "15px";
+    okBtn.style.padding = "8px 20px";
+    okBtn.style.fontSize = "14px";
+    okBtn.style.border = "none";
+    okBtn.style.borderRadius = "6px";
+    okBtn.style.backgroundColor = "#007BFF";
+    okBtn.style.color = "white";
+    okBtn.style.cursor = "pointer";
+
+    okBtn.onclick = () => document.body.removeChild(alertDiv);
+
+    alertDiv.appendChild(document.createElement("br"));
+    alertDiv.appendChild(okBtn);
+
+    document.body.appendChild(alertDiv);
+}
+
+
+// Load quizzes for left panel
+async function fetchQuizzes() {
+    const token = localStorage.getItem("token");
+    if (!token) { alert("You must be logged in to see quizzes."); return; }
+
+    try {
+        const res = await fetch("http://127.0.0.1:8000/quiz/all", { headers: { "Authorization": `Bearer ${token}` } });
+        const quizzes = await res.json();
+        const quizButtonsDiv = document.getElementById("quiz-buttons");
+        quizButtonsDiv.innerHTML = "";
+        if (quizzes.length === 0) { quizButtonsDiv.textContent = "No quizzes available yet."; return; }
+
+        buttons = [];
+        quizzes.forEach(q => {
+            const btn = document.createElement("button");
+            btn.textContent = q.title;
+            btn.addEventListener("click", () => selectQuiz(q.id, q.title, btn));
+            quizButtonsDiv.appendChild(btn);
+            buttons.push(btn);
+        });
+    } catch (err) { console.error(err); alert("Could not load quizzes."); }
+}
+
+// Redirect to leaderboard page when clicked
+document.getElementById("leaderboard-btn").addEventListener("click", () => {
+    if (selectedQuiz) {
+        window.location.href = `leaderboard.html?quiz_id=${selectedQuiz.id}`;
+    } else {
+        alert("Please select a quiz first to view its leaderboard.");
+    }
+});
+
+function selectQuiz(id, title, btn) {
+    selectedQuiz = {id, title};
+    buttons.forEach(b => b.classList.remove("selected"));
+    btn.classList.add("selected");
+    document.querySelector("#central-box h2").textContent = `Selected Quiz: ${title}`;
+    document.getElementById("start-quiz-btn").style.display = "inline-block";
+    document.getElementById("quiz-question-container").style.display = "none";
+    document.getElementById("score-display").style.display = "none";
+    score = 0;
+}
+
+document.getElementById("start-quiz-btn").addEventListener("click", async () => {
+    if (!selectedQuiz) return;
+    const token = localStorage.getItem("token");
+
+    try {
+        const res = await fetch("http://127.0.0.1:8000/quiz/by-title", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
+            body: JSON.stringify({ title: selectedQuiz.title })
+        });
+        const data = await res.json();
+        currentQuestions = data.questions; currentIndex = 0; selectedOption = null; score = 0;
+
+        document.getElementById("start-quiz-btn").style.display = "none";
+        document.getElementById("quiz-question-container").style.display = "block";
+        document.getElementById("score-display").style.display = "block";
+        document.getElementById("score-display").textContent = `Score: ${score}`;
+
+        showQuestion(currentIndex);
+
+    } catch(err) { console.error(err); alert("Could not load quiz questions."); }
+});
+
+function showQuestion(index) {
+    const q = currentQuestions[index];
+    const questionText = document.getElementById("question-text");
+    const optionsContainer = document.getElementById("options-container");
+    questionText.textContent = q.question;
+    optionsContainer.innerHTML = "";
+    selectedOption = null;
+
+    q.options.forEach(opt => {
+        const btn = document.createElement("button");
+        btn.textContent = opt;
+        btn.style.display = "block";
+        btn.style.width = "100%";
+        btn.style.padding = "10px";
+        btn.style.marginBottom = "10px";
+        btn.style.borderRadius = "6px";
+        btn.style.border = "1px solid #ccc";
+        btn.style.cursor = "pointer";
+        btn.style.backgroundColor = "#f2f2f2";
+        btn.style.color = "black";
+
+        btn.addEventListener("click", () => {
+            selectedOption = opt;
+            Array.from(optionsContainer.children).forEach(b => {
+                b.style.backgroundColor = "#f2f2f2";
+                b.style.color = "black";
+            });
+            btn.style.backgroundColor = "#007BFF";
+            btn.style.color = "white";
+        });
+        optionsContainer.appendChild(btn);
+    });
+
+    document.getElementById("submit-btn").style.display = "inline-block";
+    document.getElementById("next-btn").style.display = "none";
+}
+
+document.getElementById("submit-btn").addEventListener("click", () => {
+    if (!selectedOption) { alert("Please select an option"); return; }
+    const correctAnswer = currentQuestions[currentIndex].correct_answer;
+    const optionsContainer = document.getElementById("options-container");
+
+    Array.from(optionsContainer.children).forEach(b => {
+        if (b.textContent === correctAnswer) {
+            b.style.backgroundColor = "#28a745";
+            b.style.color = "white";
+        } else if (b.textContent === selectedOption) {
+            b.style.backgroundColor = "#dc3545";
+            b.style.color = "white";
+        } else {
+            b.style.backgroundColor = "#6c757d";
+            b.style.color = "white";
+        }
+        b.disabled = true;
+    });
+
+    if (selectedOption === correctAnswer) { score++; }
+    document.getElementById("score-display").textContent = `Score: ${score}`;
+
+    document.getElementById("submit-btn").style.display = "none";
+    document.getElementById("next-btn").style.display = "inline-block";
+});
+
+document.getElementById("next-btn").addEventListener("click", async () => {
+    currentIndex++;
+    if (currentIndex < currentQuestions.length) {
+        showQuestion(currentIndex);
+    } else {
+        //alert(`Quiz completed! Final score: ${score}/${currentQuestions.length}`);
+        showCenteredAlert(`Quiz completed! Final score: ${score}/${currentQuestions.length}`);
+
+        document.getElementById("quiz-question-container").style.display = "none";
+        document.querySelector("#central-box h2").textContent = "Select a quiz to start";
+        document.getElementById("start-quiz-btn").style.display = "inline-block";
+        document.getElementById("score-display").style.display = "none";
+
+        // Submit score to backend only
+        const userId = localStorage.getItem("user_id");
+        const token = localStorage.getItem("token");
+
+     //   if (!selectedQuiz || typeof score !== "number" || !currentQuestions?.length) {
+      //      console.error("Cannot submit score: missing or invalid data", { selectedQuiz, score, currentQuestions });
+      //      return;
+      //  }
+
+        try {
+            const payload = {
+                user_IDD: Number(userId),
+                quiz_id: Number(selectedQuiz.id),
+                score: Number(score),
+                total_questions: Number(currentQuestions.length)
+            };
+
+            const res = await fetch("http://127.0.0.1:8000/quiz/submit-score", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"},
+                body: JSON.stringify(payload)
+            });
+
+            if (!res.ok) {
+                const errData = await res.json();
+                console.error("Score submission failed:", errData);
+            } else {
+                console.log("Score submitted successfully");
+            }
+        } catch(err) {
+            console.error("Score not submitted", err);
+        }
+    }
+});
+
+window.addEventListener("DOMContentLoaded", fetchQuizzes);
+    const username = localStorage.getItem("username");
+const userDiv = document.getElementById("logged-in-user");
+if (username) {
+    userDiv.textContent = `${username}`;
+} else {
+    userDiv.textContent = "Not logged in";
+}
+
+document.getElementById("logout-btn").addEventListener("click", function() {
+localStorage.clear();
+window.location.href = "index.html";
+});
+</script>
+
+</body>
+</html>

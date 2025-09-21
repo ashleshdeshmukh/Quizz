@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Leaderboard • Quizzed</title>
+  <link rel="stylesheet" href="style.css"/>
+  <link rel="stylesheet" href="landing.css"/>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=menu" />
+  <style>
+    #container {
+    display: flex;
+    gap: 20px;
+    padding: 0 20px 20px 20px; /* remove top padding only */
+    min-height: calc(100vh - 200px);
+    align-items: flex-start;   /* ensure items align to top */
+    }
+
+    #quiz-list-panel {
+      width: 220px;
+      border-right:1px solid #ccc;
+      position:sticky;
+      top:20px;
+      max-height: calc(100vh - 60px);
+      overflow-y:auto;
+      padding-right:10px;
+    }
+    #quiz-list-panel h3 { margin-bottom: 10px; }
+    #quiz-list-panel button {
+      display: block;
+      width: 100%;
+      margin-bottom: 10px;
+      padding: 12px 15px;
+      cursor: pointer;
+      border: none;
+      background-color: #4fa4ac;
+      border-radius: 6px;
+      font-size: 16px;
+      text-align: left;
+      color: white;
+      transition: background-color 0.2s, color 0.2s;
+    }
+    #quiz-list-panel button:hover { background-color: #3a838a; }
+    #quiz-list-panel button.selected {
+      background-color: #007BFF;
+      color: white;
+      font-weight: bold;
+    }
+    #central-box {
+      flex:1;
+      padding:20px;
+      border:1px solid #ccc;
+      border-radius:6px;
+      min-height:300px;
+      margin-left:20px;
+      background-color: #40C0CB; /* original color */
+      overflow-y:auto;
+      color:black;
+    }
+    #leaderboard h3 {
+      margin-bottom: 15px;
+      text-align: center;
+      color: black;
+    }
+    .leaderboard-card {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 15px;
+      margin-bottom: 10px;
+      border-radius: 8px;
+      background-color: rgba(255, 255, 255, 0.15);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .leaderboard-card:hover {
+      transform: scale(1.02);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+    .leaderboard-rank { font-weight: bold; width: 50px; text-align:center; font-size: 22px; }
+    .leaderboard-username { flex:1; padding-left:10px; }
+    .leaderboard-score { font-weight:bold; }
+    .top1 { background-color: gold; color:#000; }
+    .top2 { background-color: silver; color:#000; }
+    .top3 { background-color: #cd7f32; color:#fff; }
+
+    /* Trophy icons */
+    .trophy {
+      margin-right: 22px;
+      font-size: 28px;
+    }
+  </style>
+</head>
+<body>
+  <div class="curved-edge"></div>
+  <h1>Quizzed</h1>
+
+  <div id="dropdowndiv">
+    <div id="dropdown" class="material-symbols-outlined"> menu </div>
+    <div id="dropdownbutton">
+      <p><a href="team.html" target="_self" id="linkteam">Our Team</a></p>
+      <!--<p>Our Journey</p> -->
+      <p><a href="landing.html" target="_self" id="linkteam">Back to Quizzes</a></p>
+    </div>
+  </div>
+
+  <main id="container">
+    <!-- Quiz List -->
+    <div id="quiz-list-panel">
+
+        <div id="logged-in-user" style="font-weight:600; font-size:16px; margin-bottom:10px;"></div>
+
+      <h3>Available Quizzes</h3>
+      <div id="quiz-buttons"></div>
+    </div>
+
+    <!-- Central Box -->
+    <div id="central-box">
+      <h2>Select a quiz to see its leaderboard</h2>
+      <div id="leaderboard"></div>
+    </div>
+  </main>
+
+<script>
+let selectedQuiz = null, buttons = [];
+
+// Fetch quizzes for left panel
+async function fetchQuizzes() {
+    try {
+        const res = await fetch("http://127.0.0.1:8000/quiz/all");
+        if (!res.ok) throw new Error("Failed to fetch quizzes");
+        const quizzes = await res.json();
+        const quizButtonsDiv = document.getElementById("quiz-buttons");
+        quizButtonsDiv.innerHTML = "";
+        if (quizzes.length === 0) {
+            quizButtonsDiv.textContent = "No quizzes available.";
+            return;
+        }
+
+        buttons = [];
+        quizzes.forEach(q => {
+            const btn = document.createElement("button");
+            btn.textContent = q.title;
+            btn.style.backgroundColor = "#4fa4ac";
+            btn.style.color = "white";
+            btn.addEventListener("click", () => selectQuiz(q.id, q.title, btn));
+            quizButtonsDiv.appendChild(btn);
+            buttons.push(btn);
+        });
+    } catch(err) {
+        console.error(err);
+        alert("Could not load quizzes.");
+    }
+}
+
+// Show leaderboard for selected quiz
+async function selectQuiz(quizId, title, btn) {
+    selectedQuiz = {id: quizId, title: title};
+    buttons.forEach(b => { b.classList.remove("selected"); });
+    btn.classList.add("selected");
+
+    const leaderboardContainer = document.getElementById("leaderboard");
+    leaderboardContainer.innerHTML = `<h3>${title} Leaderboard</h3><p>Loading...</p>`;
+
+    try {
+        const res = await fetch(`http://127.0.0.1:8000/quiz/leaderboard/${quizId}`);
+        if (!res.ok) throw new Error("Failed to fetch leaderboard");
+
+        const data = await res.json();
+        const leaderboard = data.leaderboard || [];
+
+        if (leaderboard.length === 0) {
+            leaderboardContainer.innerHTML = `<h3>${title} Leaderboard</h3><p>No scores yet.</p>`;
+            return;
+        }
+
+        leaderboardContainer.innerHTML = `<h3>${title} Leaderboard</h3>`;
+        leaderboard.forEach((entry, index) => {
+            const card = document.createElement("div");
+            card.classList.add("leaderboard-card");
+            let trophy = "";
+            if (index === 0) { card.classList.add("top1"); trophy = "🏆"; }
+            else if (index === 1) { card.classList.add("top2"); trophy = "🥈"; }
+            else if (index === 2) { card.classList.add("top3"); trophy = "🥉"; }
+
+            card.innerHTML = `
+                <div class="leaderboard-rank">${trophy}${index + 1}</div>
+                <div class="leaderboard-username">${entry.username}</div>
+                <div class="leaderboard-score">${entry.score}/${entry.total}</div>
+            `;
+            leaderboardContainer.appendChild(card);
+        });
+
+    } catch(err) {
+        console.error(err);
+        leaderboardContainer.innerHTML = `<h3>${title} Leaderboard</h3><p>Could not load leaderboard.</p>`;
+    }
+}
+
+window.addEventListener("DOMContentLoaded", fetchQuizzes);
+
+const username = localStorage.getItem("username");
+const userDiv = document.getElementById("logged-in-user");
+if (username) {
+    userDiv.textContent = `${username}`;
+} else {
+    userDiv.textContent = "Not logged in";
+}
+
+</script>
+</body>
+</html>
