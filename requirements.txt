@@ -1,4 +1,4 @@
 flask
 flask-sqlalchemy
-flask_jwt_extendend
+Flask-JWT-Extended
 flask_CORS
